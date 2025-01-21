@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 50px auto;
+            max-width: 500px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #007bff;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .payment-section {
+            margin-top: 30px;
+        }
+        .payment-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .payment-option {
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            margin: 10px;
+            flex: 1;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .payment-option img {
+            width: 50px;
+            height: auto;
+        }
+        .payment-option:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .selected {
+            border: 2px solid #007bff;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        #qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+        #qr-modal img {
+            width: 300px;
+            height: auto;
+        }
+        #qr-modal .details {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #qr-modal .close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        #qr-modal .countdown {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #qr-modal .download-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        #qr-modal .download-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Checkout</h2>
+        <form id="checkoutForm">
+            <div class="input-group">
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="input-group">
+                <label for="whatsapp">WhatsApp Number:</label>
+                <input type="text" id="whatsapp" name="whatsapp" required>
+            </div>
+            <div class="input-group">
+                <label for="whatsapp">Email:</label>
+                <input type="text" id="whatsapp" name="whatsapp" required>
+            </div>			
+            <div class="input-group">
+                <label for="package">Selected Package:</label>
+                <input type="text" id="package" name="package" readonly>
+            </div>
+            <div class="input-group">
+                <label for="amount">Amount:</label>
+                <input type="text" id="amount" name="amount" readonly>
+            </div>
+            <div class="payment-section">
+                <h3>Select Payment Method</h3>
+                <div class="payment-options">
+                    <div class="payment-option" id="paytm">
+                        <img src="https://raw.githubusercontent.com/hdpngworld/HPW/main/uploads/650d41381232a-l.png" alt="Paytm">
+                        <p>Paytm</p>
+                    </div>
+                    <div class="payment-option" id="phonepe">
+                        <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/phonepe-icon.png" alt="PhonePe">
+                        <p>PhonePe</p>
+                    </div>
+                    <div class="payment-option" id="gpay">
+                        <img src="https://w7.pngwing.com/pngs/191/51/png-transparent-google-pay-or-tez-hd-logo-thumbnail.png" alt="Google Pay">
+                        <p>Google Pay</p>
+                    </div>
+                    <div class="payment-option" id="upi-qr">
+                        <img src="https://qph.cf2.quoracdn.net/main-qimg-6f10dcab91fe9a768c8757381a98e9ae-pjlq" alt="UPI QR">
+                        <p>UPI QR Code</p>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="button">Pay Now & Download</button>
+        </form>
+    </div>
+    <div id="qr-modal">
+        <div class="close" onclick="closeQRModal()">×</div>
+        <img id="qr-image" alt="QR Code">
+        <div class="details">
+            <p><strong>Name:</strong> <span id="qr-name"></span></p>
+            <p><strong>Amount:</strong> ₹<span id="qr-amount"></span></p>
+            <p><strong>UPI ID:</strong> <span id="qr-upi"></span></p>
+            <p><strong>Package:</strong> <span id="qr-package"></span></p>
+            <div class="countdown" id="countdown-timer"></div>
+            <button class="download-btn" onclick="downloadQR()">Download QR Code</button>
+        </div>
+    </div>
+    <script>
+        let selectedMethod = null;
+        const paymentOptions = document.querySelectorAll('.payment-option');
+        const qrModal = document.getElementById('qr-modal');
+        const qrImage = document.getElementById('qr-image');
+        const qrName = document.getElementById('qr-name');
+        const qrAmount = document.getElementById('qr-amount');
+        const qrUPI = document.getElementById('qr-upi');
+        const qrPackage = document.getElementById('qr-package');
+        const countdownTimer = document.getElementById('countdown-timer');
+
+        paymentOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                paymentOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedMethod = option.id;
+            });
+        });
+
+        document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!selectedMethod) {
+                alert('Please select a payment method.');
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const amount = formData.get('amount').replace('₹', '');
+            const name = formData.get('name');
+            const packageName = formData.get('package');
+            const upiID = "amazon-india@yesbank";
+
+            if (selectedMethod === 'upi-qr') {
+                const upiLink = `upi://pay?pa=${upiID}&pn=NumbersCo&am=${amount}&cu=INR&tn=Payment for ${encodeURIComponent(packageName)}`;
+                qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(upiLink)}&size=300x300`;
+                qrName.textContent = name;
+                qrAmount.textContent = amount;
+                qrUPI.textContent = upiID;
+                qrPackage.textContent = packageName;
+                qrModal.style.display = 'flex';
+
+                // Start countdown
+                let countdown = 300;
+                const interval = setInterval(() => {
+                    const minutes = Math.floor(countdown / 60);
+                    const seconds = countdown % 60;
+                    countdownTimer.textContent = `Time Left: ${minutes}m ${seconds}s`;
+                    countdown -= 1;
+
+                    if (countdown < 0) {
+                        clearInterval(interval);
+                        countdownTimer.textContent = "QR Code Expired.";
+                    }
+                }, 1000);
+            } else {
+                const paymentURL = `/pay/${selectedMethod}?amount=${amount}&name=${encodeURIComponent(name)}&whatsapp=${encodeURIComponent(formData.get('whatsapp'))}&package=${encodeURIComponent(packageName)}`;
+                window.location.href = paymentURL;
+            }
+        });
+
+        function closeQRModal() {
+            qrModal.style.display = 'none';
+        }
+
+        function downloadQR() {
+            const link = document.createElement('a');
+            link.href = qrImage.src;
+            link.download = 'UPI_QR_Code.png';
+            link.click();
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const packageName = urlParams.get("package");
+        const prices = {
+            "10 thousand Numbers": "99",
+			"1 Lakh Numbers": "299",
+            "5 Lakhs Numbers": "599",
+            "10 Lakhs Numbers": "999"
+        };
+        document.getElementById("package").value = packageName || "Unknown";
+        document.getElementById("amount").value = `₹${prices[packageName] || "0"}`;
+    </script>
+</body>
+</html>
